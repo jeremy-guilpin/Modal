@@ -1,4 +1,18 @@
-var _log = function(a) {
+// @TODO
+/*
+- loadScript Cookie
+- faire cookie
+- améliorer debug
+- ajouter des tailles (small, medium, big) de la modal
+- faire alert
+- faire confirm
+- ajouter style css
+- ajouter effet css
+- faire doc
+- faire landing page
+*/
+var DEBUG = false;
+var _log  = function(a) {
 	console.log(a);
 }
 
@@ -22,39 +36,80 @@ loadScript('/js/cookie.js', function() {
 });*/
 
 var Modal = {
-	// Cookie pour modal
+	up : function() {
+		document.querySelector('#modal').style.top = '-100%';
+	},
 	down : function() {
 		document.querySelector('#modal').style.top = '40%';
-		/*$('#modal-message-close').click(function() {
-			$('#modal-message').css('top', '-50%');
-		});*/
 	},
-	cookie : function(nameCookie) {
-		if ( nameCookie ) {
-			if ( Cookies.get(nameCookie) === undefined ) {
-				Cookies.set(nameCookie, nameCookie, { expires: 1 });
+	cookie : function(name) {
+		if ( name ) {
+			if ( Cookies.get(name) === undefined ) {
+				Cookies.set(name, name, { expires: 1 });
 
-				Modal.modalShow();
+				Modal.show();
 			} else {
-				$('#header_user li.login > a').click(function(e) {
+				/*$('#header_user li.login > a').click(function(e) {
 					var href = $(this).attr('href');
-					if ( href.indexOf("?mylogout=") != -1 ) {
-						if ( Cookies.get(nameCookie) ) Cookies.remove(nameCookie);
-					}
-				});
+					if ( href.indexOf("?mylogout=") != -1 ) {*/
+
+						if ( Cookies.get(name) ) {
+							Modal.hide(function() {
+								Cookies.remove(name);
+							});
+						}
+
+					/*}
+				});*/
 			}
 		}
 	},
-	create : function(message, callback) {
+	create : function(params, callback) {
+
+		params.width = (params.width) ? params.width : 300;
+		params.padding = (params.padding) ? params.padding : 20;
+		params.backgroundColor = (params.backgroundColor) ? params.backgroundColor : '#000000';
+		params.border = (params.borderColor) ? '2px solid ' + params.borderColor : '2px solid #FFFFFF';
 
 		var block = document.createElement('div');
 			block.setAttribute('id', 'modal');
+			block.style.position = 'absolute';
+			block.style.left     = '50%';
+			block.style.marginLeft = '-'+parseInt(params.width/2)+'px';
+			block.style.width    = params.width + 'px';
+			block.style.padding  = params.padding + 'px';
+			block.style.backgroundColor = params.backgroundColor;
+			block.style.transition = 'all .5s ease-in-out';
+			block.style.boxShadow = '0 0 25px rgba(0,0,0,.4)';
 
 		var p = document.createElement('p');
-			p.innerHTML = (message) ? message : 'Message vide';
+			p.style.position = 'relative';
+			p.style.color = '#FFFFFF';
+			p.style.fontWeight = 'bold';
+			p.style.textAlign = 'center';
+			p.style.padding = params.padding + 'px ' + parseInt(params.padding/2) + 'px';
+			p.style.borderTop = params.border;
+			p.style.borderBottom = params.border;
+			p.innerHTML = (params.message) ? params.message : 'Message vide';
 
 		var btn = document.createElement('button');
 			btn.innerHTML = 'X';
+			btn.style.position = 'absolute';
+			btn.style.top = '0';
+			btn.style.right = '0';
+			btn.style.color = '#FFFFFF';
+			btn.style.fontWeight = 'bold';
+			btn.style.fontSize = '18px';
+			btn.style.background = 'none';
+			btn.style.border = '0 none';
+			btn.style.cursor = 'pointer';
+			btn.addEventListener('click', function(e) {
+				Modal.up();
+			}, false)
+			/*btn.addEventListener('hover', function() {
+				btn.style.backgroundColor = '#FFFFFF';
+				btn.style.color = '#000000';
+			});*/
 
 		block.appendChild(p);
 		block.appendChild(btn);
@@ -64,44 +119,19 @@ var Modal = {
 		if (callback && typeof(callback) === 'function') callback();
 
 	},
-	message : function(params) {
-
-		_log('params =>', params);
-
-		// console.log( 'valeur du Cookie =>', Cookies.get('modal') );
-
-		/*var url = document.location.href;
-		var date = new Date(),
-		day = date.getDate(),
-		month = date.getMonth() + 1,
-		year = date.getFullYear();*/
-		
-		// console.log('date =>', day, month, year);
-
-		/*if ( $('body#index').length == 0 ) {
-			if ( url.indexOf('/connexion') == -1 && url.indexOf('/commande-rapide') == -1 ) {
-				if ( day >= 1 && day <= 14 && month == 8 && year == 2016 ) {
-					Modal.cookieMade('modal-page');
-				}
-			} else if ( url.indexOf('/connexion') == -1 && url.indexOf('/commande-rapide') != -1 ) {
-				if ( day >= 15 && day <= 21 && month == 8 && year == 2016 ) {
-					Modal.modalShow();
-				}
-			}
-		}*/
-
-	},
 	show : function(params) {
 		
-		if (params) {
-			Modal.create(params.message, function() {
+		if (params && typeof(params) === 'object') {
+			Modal.create(params, function() {
 				Modal.down();
 			});
 		}
 
 	},
 	hide : function(callback) {
+
 		document.querySelector('#modal').style.display = 'none';
 		if (callback && typeof(callback) === 'function') callback();
+
 	}
 }
